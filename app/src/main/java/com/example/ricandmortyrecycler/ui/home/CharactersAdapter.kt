@@ -23,8 +23,16 @@ import com.example.ricandmortyrecycler.models.Character
  */
 
 class CharactersAdapter(
-    private val characters: List<Character>
-) : RecyclerView.Adapter<CharactersAdapter.CharacterViewHolder>() {
+    private val characters: List<Character> // данные передаются адаптеру при его создании.
+)
+
+/*Это наследование от базового класса RecyclerView.Adapter,
+где CharactersAdapter.CharacterViewHolder является типом ViewHolder,
+который будет использоваться для отображения каждого элемента списка.
+
+ViewHolder представляет собой конкретный объект,
+который хранит ссылки на все подпредставления в одном элементе списка, и который умеет их заполнять.*/
+    : RecyclerView.Adapter<CharactersAdapter.CharacterViewHolder>() {
 
     /**
      * отвечает за хранение представлений элемента списка. У вас есть четыре представления

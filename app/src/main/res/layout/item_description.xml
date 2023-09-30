@@ -16,9 +16,10 @@
         android:layout_height="wrap_content"
         android:text="Description Name" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switchMeUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
 </LinearLayout>
+

@@ -12,7 +12,6 @@ import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.R
 import com.example.ricandmortyrecycler.databinding.FragmentDashboardBinding
 import com.example.ricandmortyrecycler.models.LocationsResponse
-import com.example.ricandmortyrecycler.ui.home.CharactersAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

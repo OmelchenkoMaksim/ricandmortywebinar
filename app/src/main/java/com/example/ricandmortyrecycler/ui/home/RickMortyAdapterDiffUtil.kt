@@ -5,6 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.ricandmortyrecycler.R
@@ -12,45 +14,27 @@ import com.example.ricandmortyrecycler.models.Character
 import com.example.ricandmortyrecycler.models.RickMortyItem
 
 /**
- * В контексте программирования паттерн "Адаптер" представляет собой структурный паттерн проектирования,
- * который позволяет объектам с несовместимыми интерфейсами работать вместе.
+ * ListAdapter — это специализированный подкласс RecyclerView.Adapter,
+ * который упрощает работу с адаптерами, использующими DiffUtil для оптимизированного обновления данных.
  *
- * В контексте RecyclerView (и других компонентов Android, таких как ListView),
- * адаптер используется для преобразования данных из некоторой структуры данных (например, списка, массива или базы данных)
- * в виджеты, которые могут быть отображены в пользовательском интерфейсе.
- *
- * Мост между данными и UI: Адаптер предоставляет способ доступа к данным и их преобразования в виджеты для отображения.
- * В этом смысле адаптер действует как посредник или "адаптер" между структурой данных и RecyclerView.
+ * Инициализация адаптера: Когда вы создаете экземпляр ListAdapter,
+ * вы передаете экземпляр DiffUtil.ItemCallback в качестве аргумента.
  */
-
-// Интерфейс для того что бы сделать передачу логики нажатия на свитчер и реализовать ее во фрагменте
-interface OnSwitchClickListener {
-    fun onSwitchClicked()
-}
-
-// Адаптер для нескольких вью тайпов
-class RickMortyAdapter(
-    private val items: MutableList<RickMortyItem>,
+class RickMortyAdapterDiffUtil(
     private val switchClickListener: OnSwitchClickListener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : ListAdapter<RickMortyItem, RecyclerView.ViewHolder>(RickMortyDiffCallback()) {
 
+    //    Обновление данных: Вместо прямого обновления списка в адаптере (как вы бы делали с обычным RecyclerView.Adapter),
+//    вы используете метод submitList:
+//    adapter.submitList(newList)
     companion object {
         const val TYPE_TITLE = 0
         const val TYPE_CHARACTER = 1
         const val TYPE_DESCRIPTION = 2
     }
 
-    /**
-     * Обновление данных в адаптере для добавления новых элементов.
-     */
-    fun addItems(newItems: List<RickMortyItem>) {
-        val startPosition = items.size
-        items.addAll(newItems)
-        notifyItemRangeInserted(startPosition, newItems.size)
-    }
-
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (getItem(position)) {
             is RickMortyItem.Title -> TYPE_TITLE
             is RickMortyItem.CharacterInfo -> TYPE_CHARACTER
             is RickMortyItem.Description -> TYPE_DESCRIPTION
@@ -82,7 +66,7 @@ class RickMortyAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = items[position]) {
+        when (val item = getItem(position)) {
             is RickMortyItem.Title -> (holder as TitleViewHolder).bind(item)
             is RickMortyItem.CharacterInfo -> (holder as CharacterViewHolder).bind(item.character)
             is RickMortyItem.Description -> (holder as DescriptionViewHolder).bind(item)
@@ -125,6 +109,25 @@ class RickMortyAdapter(
     }
 
 
-    override fun getItemCount() = items.size
+    /**
+     * В основе DiffUtil лежит алгоритм, который вычисляет разницу между двумя списками и выдает
+     * минимальный набор операций обновления для преобразования одного списка в другой.
+     *
+     * Это позволяет адаптеру автоматически обновлять только те элементы, которые были добавлены,
+     * удалены или изменены, вместо перерисовки всего списка.
+     * Это делает анимации и обновления более плавными и эффективными.
+     *
+     * DiffUtil.ItemCallback: Это абстрактный класс, который нужно реализовать,
+     * чтобы DiffUtil мог понять, как сравнивать элементы списка.
+     */
+    class RickMortyDiffCallback : DiffUtil.ItemCallback<RickMortyItem>() {
+        override fun areItemsTheSame(oldItem: RickMortyItem, newItem: RickMortyItem): Boolean {
+            return oldItem == newItem // или другое условие для сравнения ID элементов
+        }
+
+        override fun areContentsTheSame(oldItem: RickMortyItem, newItem: RickMortyItem): Boolean {
+            return oldItem == newItem // или другое условие для сравнения содержимого элементов
+        }
+    }
 
 }

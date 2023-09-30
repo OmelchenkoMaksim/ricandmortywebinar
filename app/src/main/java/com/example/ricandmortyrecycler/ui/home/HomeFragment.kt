@@ -25,8 +25,8 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     private var currentPage = 1
 
     // Создание адаптера один раз:
-    private val rickMortyAdapter = RickMortyAdapter(mutableListOf(), this)
-
+//    private val rickMortyAdapter = RickMortyAdapter(mutableListOf(), this)
+    private val rickMortyAdapter = RickMortyAdapterDiffUtil(this)
 
 
     override fun onCreateView(
@@ -38,7 +38,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
         binding.charactersRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.charactersRecyclerView.adapter =
-            rickMortyAdapter // Пустой адаптер для начала
+            rickMortyAdapter
 
         binding.charactersRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
@@ -110,12 +110,19 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 //                        rickAdapterWithManyItems(response)
 
 
-                        rickAdapterSmooth(response)
+//                        rickAdapterSmooth(response)
+
+                        rickAdapterSmoothDiffUtil(response)
 
 
                         // Обновление кнопок на основе данных ответа
                         binding.prevButton.isEnabled = response.body()!!.info.prev != null
                         binding.nextButton.isEnabled = response.body()!!.info.next != null
+
+//           вызов response.raw().body.string() будет потреблять тело ответа, и вы не сможете его повторно прочитать
+                        Log.w("mylog", "RAW RESPONSE Headers: ${response.raw().headers}")
+                        Log.w("mylog", "RAW RESPONSE Body: ${response.raw().body}")
+
 
                     } else {
                         Log.e("mylog", "empty " + response.toString() + response.body().toString())
@@ -126,6 +133,14 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
                     Log.e("mylog", "onFailure $t")
                 }
             })
+    }
+
+
+    // самый простой
+    private fun characterAdapter(response: Response<CharactersResponse>) {
+        val listOfCharacters = response.body()!!.results
+        Log.e("mylog", "list size is ${listOfCharacters.size}")
+        binding.charactersRecyclerView.adapter = CharactersAdapter(listOfCharacters)
     }
 
     private fun rickAdapterWithManyItems(response: Response<CharactersResponse>) {
@@ -143,6 +158,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     /**
      * Адаптер с плавной подгрузкой
      */
+
     private fun rickAdapterSmooth(response: Response<CharactersResponse>) {
         val newItems = mutableListOf<RickMortyItem>()
         if (currentPage % 10 == 0) {
@@ -153,13 +169,30 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
             RickMortyItem.CharacterInfo(character)
         })
 
-        rickMortyAdapter.addItems(newItems)
+//        if (rickMortyAdapter is RickMortyAdapter) {
+//            rickMortyAdapter.addItems(newItems)
+//        }
     }
 
-    private fun characterAdapter(response: Response<CharactersResponse>) {
-        val listOfCharacters = response.body()!!.results
-        Log.e("mylog", "list size is ${listOfCharacters.size}")
-        binding.charactersRecyclerView.adapter = CharactersAdapter(listOfCharacters)
+    //    этот список нужен для плавного списка с DiffUtil
+    private val allItems = mutableListOf<RickMortyItem>()
+
+    /*Адаптер с плавной подгрузкой*/
+    private fun rickAdapterSmoothDiffUtil(response: Response<CharactersResponse>) {
+        val newItems = mutableListOf<RickMortyItem>()
+        if (currentPage % 10 == 0) {
+            newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
+            newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
+        }
+        newItems.addAll(response.body()!!.results.map { character ->
+            RickMortyItem.CharacterInfo(character)
+        })
+
+        allItems.addAll(newItems)  // Добавляем новые элементы к существующим
+
+        if (rickMortyAdapter is RickMortyAdapterDiffUtil) {
+            rickMortyAdapter.submitList(allItems.toList())  // Обновляем адаптер с полным списком элементов
+        }
     }
 
 

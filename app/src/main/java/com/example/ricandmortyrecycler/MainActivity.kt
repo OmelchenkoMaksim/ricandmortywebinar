@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val interceptor = HttpLoggingInterceptor()
+//        логирует запрос ответ и тело - рассказать об этом
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    companion object{
+    companion object {
         var api: RickAndMortyAPI? = null
     }
 

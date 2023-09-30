@@ -19,4 +19,3 @@ interface RickAndMortyAPI {
         @Query("page") page: Int // для пагинации
     ): Call<LocationsResponse>
 }
-
