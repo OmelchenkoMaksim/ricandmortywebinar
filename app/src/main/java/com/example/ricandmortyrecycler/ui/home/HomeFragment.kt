@@ -6,15 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.databinding.FragmentHomeBinding
 import com.example.ricandmortyrecycler.models.CharactersResponse
+import com.example.ricandmortyrecycler.models.RickMortyItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), OnSwitchClickListener {
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -30,9 +32,40 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        binding.charactersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.charactersRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.charactersRecyclerView.adapter =
             CharactersAdapter(emptyList()) // Пустой адаптер для начала
+
+        binding.charactersRecyclerView.addOnScrollListener(object :
+            RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = binding.charactersRecyclerView.layoutManager
+
+                /*
+Эта проверка связана с тем, что binding.charactersRecyclerView.layoutManager
+имеет тип LayoutManager?, но GridLayoutManager содержит дополнительные методы,
+такие как findLastVisibleItemPosition(), которых нет в родительском LayoutManager.
+*/                  if (layoutManager is GridLayoutManager) {
+
+                    // Позиция последнего видимого элемента
+                    val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                    // Общее количество элементов
+                    val totalItemCount = layoutManager.itemCount
+
+                    // Условие, определяющее, когда нужно подгрузить новые данные
+                    val isLoadingNeeded = lastVisibleItemPosition + 1 == totalItemCount
+
+                    if (isLoadingNeeded) {
+                        // Загрузите больше данных
+                        currentPage++
+                        loadCharacters()
+                    }
+                }
+            }
+        })
 
         return binding.root
     }
@@ -66,13 +99,15 @@ class HomeFragment : Fragment() {
                     response: Response<CharactersResponse>
                 ) {
                     if (response.isSuccessful && response.body() != null) {
-                        val listOfCharacters = response.body()!!.results
-                        Log.e("mylog", "list size is ${listOfCharacters.size}")
-                        binding.charactersRecyclerView.adapter = CharactersAdapter(listOfCharacters)
+
+                        rickAdapter(response)
+
+//                        characterAdapter(response)
 
                         // Обновление кнопок на основе данных ответа
                         binding.prevButton.isEnabled = response.body()!!.info.prev != null
                         binding.nextButton.isEnabled = response.body()!!.info.next != null
+
                     } else {
                         Log.e("mylog", "empty " + response.toString() + response.body().toString())
                     }
@@ -84,10 +119,34 @@ class HomeFragment : Fragment() {
             })
     }
 
+    private fun rickAdapter(response: Response<CharactersResponse>) {
+        val items = mutableListOf<RickMortyItem>()
+
+        items.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
+        items.add(RickMortyItem.Description("Здесь представлены различные герои..."))
+
+        items.addAll(response.body()!!.results.map { character ->
+            RickMortyItem.CharacterInfo(character)
+        })
+        binding.charactersRecyclerView.adapter = RickMortyAdapter(items, this)
+    }
+
+    private fun characterAdapter(response: Response<CharactersResponse>) {
+        val listOfCharacters = response.body()!!.results
+        Log.e("mylog", "list size is ${listOfCharacters.size}")
+        binding.charactersRecyclerView.adapter = CharactersAdapter(listOfCharacters)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun onSwitchClicked() {
+        currentPage++
+        loadCharacters()
+    }
+
 }
 

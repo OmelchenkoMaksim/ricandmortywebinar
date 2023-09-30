@@ -36,3 +36,5 @@ class CharactersAdapter(private val characters: List<Character>)
 
     override fun getItemCount() = characters.size
 }
+
+

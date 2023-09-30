@@ -16,7 +16,7 @@ class LocationsAdapter(private val locations: List<Location>) : RecyclerView.Ada
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.location_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_location, parent, false)
         return ViewHolder(view)
     }
 
