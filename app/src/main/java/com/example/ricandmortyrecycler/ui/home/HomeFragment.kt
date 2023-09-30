@@ -24,6 +24,10 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
     private var currentPage = 1
 
+    // Создание адаптера один раз:
+    private val rickMortyAdapter = RickMortyAdapter(mutableListOf(), this)
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +38,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
         binding.charactersRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.charactersRecyclerView.adapter =
-            CharactersAdapter(emptyList()) // Пустой адаптер для начала
+            rickMortyAdapter // Пустой адаптер для начала
 
         binding.charactersRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
@@ -100,9 +104,14 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
                 ) {
                     if (response.isSuccessful && response.body() != null) {
 
-                        rickAdapter(response)
-
 //                        characterAdapter(response)
+
+
+//                        rickAdapterWithManyItems(response)
+
+
+                        rickAdapterSmooth(response)
+
 
                         // Обновление кнопок на основе данных ответа
                         binding.prevButton.isEnabled = response.body()!!.info.prev != null
@@ -119,7 +128,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
             })
     }
 
-    private fun rickAdapter(response: Response<CharactersResponse>) {
+    private fun rickAdapterWithManyItems(response: Response<CharactersResponse>) {
         val items = mutableListOf<RickMortyItem>()
 
         items.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
@@ -129,6 +138,22 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
             RickMortyItem.CharacterInfo(character)
         })
         binding.charactersRecyclerView.adapter = RickMortyAdapter(items, this)
+    }
+
+    /**
+     * Адаптер с плавной подгрузкой
+     */
+    private fun rickAdapterSmooth(response: Response<CharactersResponse>) {
+        val newItems = mutableListOf<RickMortyItem>()
+        if (currentPage % 10 == 0) {
+            newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
+            newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
+        }
+        newItems.addAll(response.body()!!.results.map { character ->
+            RickMortyItem.CharacterInfo(character)
+        })
+
+        rickMortyAdapter.addItems(newItems)
     }
 
     private fun characterAdapter(response: Response<CharactersResponse>) {
@@ -149,4 +174,3 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     }
 
 }
-

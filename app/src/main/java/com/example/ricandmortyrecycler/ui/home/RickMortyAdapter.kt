@@ -11,6 +11,18 @@ import com.example.ricandmortyrecycler.R
 import com.example.ricandmortyrecycler.models.Character
 import com.example.ricandmortyrecycler.models.RickMortyItem
 
+/**
+ * В контексте программирования паттерн "Адаптер" представляет собой структурный паттерн проектирования,
+ * который позволяет объектам с несовместимыми интерфейсами работать вместе.
+ *
+ * В контексте RecyclerView (и других компонентов Android, таких как ListView),
+ * адаптер используется для преобразования данных из некоторой структуры данных (например, списка, массива или базы данных)
+ * в виджеты, которые могут быть отображены в пользовательском интерфейсе.
+ *
+ * Мост между данными и UI: Адаптер предоставляет способ доступа к данным и их преобразования в виджеты для отображения.
+ * В этом смысле адаптер действует как посредник или "адаптер" между структурой данных и RecyclerView.
+ */
+
 // Интерфейс для того что бы сделать передачу логики нажатия на свитчер и реализовать ее во фрагменте
 interface OnSwitchClickListener {
     fun onSwitchClicked()
@@ -18,7 +30,7 @@ interface OnSwitchClickListener {
 
 // Адаптер для нескольких вью тайпов
 class RickMortyAdapter(
-    private val items: List<RickMortyItem>,
+    private val items: MutableList<RickMortyItem>,
     private val switchClickListener: OnSwitchClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -26,6 +38,15 @@ class RickMortyAdapter(
         const val TYPE_TITLE = 0
         const val TYPE_CHARACTER = 1
         const val TYPE_DESCRIPTION = 2
+    }
+
+    /**
+     * Обновление данных в адаптере для добавления новых элементов.
+     */
+    fun addItems(newItems: List<RickMortyItem>) {
+        val startPosition = items.size
+        items.addAll(newItems)
+        notifyItemRangeInserted(startPosition, newItems.size)
     }
 
     override fun getItemViewType(position: Int): Int {
