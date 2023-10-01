@@ -1,5 +1,6 @@
 package com.example.ricandmortyrecycler.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ricandmortyrecycler.network.ApiProvider
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.databinding.FragmentHomeBinding
 import com.example.ricandmortyrecycler.models.CharactersResponse
@@ -29,6 +31,15 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     private val rickMortyAdapter = RickMortyAdapterDiffUtil(this)
 
 
+    private lateinit var apiProvider: ApiProvider
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            apiProvider = context.apiProvider
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,8 +51,10 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         binding.charactersRecyclerView.adapter =
             rickMortyAdapter
 
+        // Обработчик прокрутки RecyclerView
         binding.charactersRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
+            // Этот метод вызывается при прокрутке
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
@@ -96,12 +109,15 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     }
 
     private fun loadCharacters() {
-        MainActivity.api!!.getCharacters(currentPage)
+        // Запрос к API
+        apiProvider.api.getCharacters(currentPage)
+//      Асинхронный вызов к API. Интерфейс Callback реализуется анонимнымным классом.
             .enqueue(object : Callback<CharactersResponse> {
-                override fun onResponse(
+                override fun onResponse( // Этот метод будет вызван, если сервер вернёт ответ. Не важно, успешный он или нет.
                     call: Call<CharactersResponse>,
                     response: Response<CharactersResponse>
                 ) {
+                    // Проверка на успешный ответ и наличие тела ответа
                     if (response.isSuccessful && response.body() != null) {
 
 //                        characterAdapter(response)
@@ -175,7 +191,8 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     }
 
     //    этот список нужен для плавного списка с DiffUtil
-    private val allItems = mutableListOf<RickMortyItem>()
+//    он сет, потому что в лист будут добавлятся элементы повторно
+    private val allItems = mutableSetOf<RickMortyItem>()
 
     /*Адаптер с плавной подгрузкой*/
     private fun rickAdapterSmoothDiffUtil(response: Response<CharactersResponse>) {
@@ -191,6 +208,10 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         allItems.addAll(newItems)  // Добавляем новые элементы к существующим
 
         if (rickMortyAdapter is RickMortyAdapterDiffUtil) {
+            /*
+            Метод submitList() является ключевым для работы ListAdapter, и он нужен для инициализации
+            или обновления данных, которые должны быть отображены.
+            Если этот метод не вызывается, адаптер не будет иметь "сырья" для работы */
             rickMortyAdapter.submitList(allItems.toList())  // Обновляем адаптер с полным списком элементов
         }
     }

@@ -1,5 +1,6 @@
 package com.example.ricandmortyrecycler.ui.dashboard
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ricandmortyrecycler.network.ApiProvider
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.R
 import com.example.ricandmortyrecycler.databinding.FragmentDashboardBinding
@@ -26,6 +28,14 @@ class DashboardFragment : Fragment() {
 
     private var currentPage = 1
 
+    private lateinit var apiProvider: ApiProvider
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            apiProvider = context.apiProvider
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,7 +69,7 @@ class DashboardFragment : Fragment() {
     }
 
     private fun loadLocations() {
-        MainActivity.api!!.getLocations(currentPage)
+        apiProvider.api.getLocations(currentPage)
             .enqueue(object : Callback<LocationsResponse> {
                 override fun onResponse(
                     call: Call<LocationsResponse>,
