@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.ricandmortyrecycler.R
-import com.example.ricandmortyrecycler.models.Character
 import com.example.ricandmortyrecycler.models.RickMortyItem
 
 /**
@@ -36,8 +35,9 @@ class RickMortyAdapterDiffUtil(
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is RickMortyItem.Title -> TYPE_TITLE
-            is RickMortyItem.CharacterInfo -> TYPE_CHARACTER
+            is RickMortyItem.Character -> TYPE_CHARACTER
             is RickMortyItem.Description -> TYPE_DESCRIPTION
+            else -> TODO()
         }
     }
 
@@ -68,7 +68,7 @@ class RickMortyAdapterDiffUtil(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is RickMortyItem.Title -> (holder as TitleViewHolder).bind(item)
-            is RickMortyItem.CharacterInfo -> (holder as CharacterViewHolder).bind(item.character)
+            is RickMortyItem.Character -> (holder as CharacterViewHolder).bind(item)
             is RickMortyItem.Description -> (holder as DescriptionViewHolder).bind(item)
         }
     }
@@ -100,7 +100,7 @@ class RickMortyAdapterDiffUtil(
         private val speciesTextView: TextView = itemView.findViewById(R.id.speciesTextView)
         private val imageView: ImageView = itemView.findViewById(R.id.characterImageView)
 
-        fun bind(character: Character) {
+        fun bind(character: RickMortyItem.Character) {
             nameTextView.text = character.name
             statusTextView.text = character.status
             speciesTextView.text = character.species

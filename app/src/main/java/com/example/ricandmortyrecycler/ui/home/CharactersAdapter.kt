@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.ricandmortyrecycler.R
-import com.example.ricandmortyrecycler.models.Character
+import com.example.ricandmortyrecycler.models.RickMortyItem
 
 /**
  * В контексте программирования паттерн "Адаптер" представляет собой структурный паттерн проектирования,
@@ -23,7 +23,7 @@ import com.example.ricandmortyrecycler.models.Character
  */
 
 class CharactersAdapter(
-    private val characters: List<Character> // данные передаются адаптеру при его создании.
+    private val characters: List<RickMortyItem.Character> // данные передаются адаптеру при его создании.
 )
 
 /*Это наследование от базового класса RecyclerView.Adapter,
@@ -35,10 +35,9 @@ ViewHolder представляет собой конкретный объект
     : RecyclerView.Adapter<CharactersAdapter.CharacterViewHolder>() {
 
     /**
-     * отвечает за хранение представлений элемента списка. У вас есть четыре представления
+     * CharacterViewHolder отвечает за хранение представлений элемента списка. У вас есть четыре представления
      *
      * графические элементы кешируются где то внутри вью холдера?
-     * ChatGPT
      *
      * Да и нет. В RecyclerView существует понятие пула представлений (view pool), который управляет
      * "переиспользуемыми" представлениями. Когда элемент списка скроллится за пределы экрана,

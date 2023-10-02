@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ricandmortyrecycler.network.ApiProvider
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.R
 import com.example.ricandmortyrecycler.databinding.FragmentDashboardBinding
 import com.example.ricandmortyrecycler.models.LocationsResponse
+import com.example.ricandmortyrecycler.network.ApiProvider
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,6 +36,7 @@ class DashboardFragment : Fragment() {
             apiProvider = context.apiProvider
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

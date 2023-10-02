@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ricandmortyrecycler.network.ApiProvider
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.databinding.FragmentHomeBinding
 import com.example.ricandmortyrecycler.models.CharactersResponse
 import com.example.ricandmortyrecycler.models.RickMortyItem
+import com.example.ricandmortyrecycler.network.ApiProvider
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,8 +27,8 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     private var currentPage = 1
 
     // Создание адаптера один раз:
-//    private val rickMortyAdapter = RickMortyAdapter(mutableListOf(), this)
-    private val rickMortyAdapter = RickMortyAdapterDiffUtil(this)
+    private val rickMortyAdapter = RickMortyAdapter(mutableListOf(), this)
+//    private val rickMortyAdapter = RickMortyAdapterDiffUtil(this)
 
 
     private lateinit var apiProvider: ApiProvider
@@ -126,9 +126,9 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 //                        rickAdapterWithManyItems(response)
 
 
-//                        rickAdapterSmooth(response)
+                        rickAdapterSmooth(response)
 
-                        rickAdapterSmoothDiffUtil(response)
+//                        rickAdapterSmoothDiffUtil(response)
 
 
                         // Обновление кнопок на основе данных ответа
@@ -166,7 +166,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         items.add(RickMortyItem.Description("Здесь представлены различные герои..."))
 
         items.addAll(response.body()!!.results.map { character ->
-            RickMortyItem.CharacterInfo(character)
+            character
         })
         binding.charactersRecyclerView.adapter = RickMortyAdapter(items, this)
     }
@@ -177,17 +177,14 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
     private fun rickAdapterSmooth(response: Response<CharactersResponse>) {
         val newItems = mutableListOf<RickMortyItem>()
-        if (currentPage % 10 == 0) {
             newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
             newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
-        }
-        newItems.addAll(response.body()!!.results.map { character ->
-            RickMortyItem.CharacterInfo(character)
-        })
 
-//        if (rickMortyAdapter is RickMortyAdapter) {
-//            rickMortyAdapter.addItems(newItems)
-//        }
+        newItems.addAll(response.body()!!.results)
+
+        rickMortyAdapter as RickMortyAdapter
+            rickMortyAdapter.addItems(newItems)
+
     }
 
     //    этот список нужен для плавного списка с DiffUtil
@@ -201,19 +198,17 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
             newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
             newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
         }
-        newItems.addAll(response.body()!!.results.map { character ->
-            RickMortyItem.CharacterInfo(character)
-        })
+        newItems.addAll(response.body()!!.results)
 
         allItems.addAll(newItems)  // Добавляем новые элементы к существующим
-
-        if (rickMortyAdapter is RickMortyAdapterDiffUtil) {
+// если поместить переменную адаптера сюда, то будет не сохраниять состояние, потому приведение
+        rickMortyAdapter as RickMortyAdapterDiffUtil
             /*
             Метод submitList() является ключевым для работы ListAdapter, и он нужен для инициализации
             или обновления данных, которые должны быть отображены.
             Если этот метод не вызывается, адаптер не будет иметь "сырья" для работы */
             rickMortyAdapter.submitList(allItems.toList())  // Обновляем адаптер с полным списком элементов
-        }
+
     }
 
 
