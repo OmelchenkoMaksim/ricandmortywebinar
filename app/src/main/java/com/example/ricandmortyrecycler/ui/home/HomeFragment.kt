@@ -177,13 +177,13 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
     private fun rickAdapterSmooth(response: Response<CharactersResponse>) {
         val newItems = mutableListOf<RickMortyItem>()
-            newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
-            newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
+        newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
+        newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
 
         newItems.addAll(response.body()!!.results)
 
-        rickMortyAdapter as RickMortyAdapter
-            rickMortyAdapter.addItems(newItems)
+        rickMortyAdapter
+        rickMortyAdapter.addItems(newItems)
 
     }
 
@@ -203,11 +203,11 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         allItems.addAll(newItems)  // Добавляем новые элементы к существующим
 // если поместить переменную адаптера сюда, то будет не сохраниять состояние, потому приведение
         rickMortyAdapter as RickMortyAdapterDiffUtil
-            /*
-            Метод submitList() является ключевым для работы ListAdapter, и он нужен для инициализации
-            или обновления данных, которые должны быть отображены.
-            Если этот метод не вызывается, адаптер не будет иметь "сырья" для работы */
-            rickMortyAdapter.submitList(allItems.toList())  // Обновляем адаптер с полным списком элементов
+        /*
+        Метод submitList() является ключевым для работы ListAdapter, и он нужен для инициализации
+        или обновления данных, которые должны быть отображены.
+        Если этот метод не вызывается, адаптер не будет иметь "сырья" для работы */
+        rickMortyAdapter.submitList(allItems.toList())  // Обновляем адаптер с полным списком элементов
 
     }
 
