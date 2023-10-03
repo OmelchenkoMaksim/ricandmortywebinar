@@ -57,8 +57,8 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-//        scrollListener()
+// активация плавной прокрутки
+        scrollListener()
 
         loadCharacters()
 
