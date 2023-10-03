@@ -56,6 +56,21 @@ class RickMortyAdapter(
         }
     }
 
+    /**
+    LayoutInflater.from(parent.context): Получение LayoutInflater из
+    контекста текущего родительского элемента. LayoutInflater используется для создания нового объекта View на основе XML-разметки.
+
+    .inflate(R.layout.item_title, parent, false): Метод inflate преобразует XML-разметку в реальный объект View.
+
+    R.layout.item_title: XML-файл разметки, который нужно "раздуть" (inflate).
+    parent: Родительский ViewGroup, к которому будет присоединен новый View.
+    В этом случае, parent — это сам RecyclerView.
+    false: Этот флаг указывает, нужно ли присоединять новый View к parent прямо сейчас.
+    false значит, что это сделает сам RecyclerView позже.
+
+    Прикрепление к parent означает, что созданный View будет добавлен в иерархию ViewGroup,
+    к которому он принадлежит. В контексте RecyclerView, этот родительский ViewGroup — это сам RecyclerView.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_TITLE -> {

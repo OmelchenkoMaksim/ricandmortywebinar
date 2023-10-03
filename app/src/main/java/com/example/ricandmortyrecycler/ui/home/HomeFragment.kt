@@ -6,8 +6,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.databinding.FragmentHomeBinding
@@ -48,6 +50,12 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         binding.charactersRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+
+//       Горизонтальный
+//        binding.charactersRecyclerView.layoutManager =
+//            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+
+
         binding.charactersRecyclerView.adapter =
             rickMortyAdapter
 
@@ -120,13 +128,13 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
                     // Проверка на успешный ответ и наличие тела ответа
                     if (response.isSuccessful && response.body() != null) {
 
-//                        characterAdapter(response)
+                        characterAdapter(response)
 
 
 //                        rickAdapterWithManyItems(response)
 
 
-                        rickAdapterSmooth(response)
+//                        rickAdapterSmooth(response)
 
 //                        rickAdapterSmoothDiffUtil(response)
 
@@ -165,16 +173,13 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         items.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
         items.add(RickMortyItem.Description("Здесь представлены различные герои..."))
 
-        items.addAll(response.body()!!.results.map { character ->
-            character
-        })
+        items.addAll(response.body()!!.results)
         binding.charactersRecyclerView.adapter = RickMortyAdapter(items, this)
     }
 
     /**
      * Адаптер с плавной подгрузкой
      */
-
     private fun rickAdapterSmooth(response: Response<CharactersResponse>) {
         val newItems = mutableListOf<RickMortyItem>()
         newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
