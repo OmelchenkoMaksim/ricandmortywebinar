@@ -41,8 +41,9 @@ class RickMortyAdapter(
 
     /**
      * Обновление данных в адаптере для добавления новых элементов.
+     * ПЛАВНОСТЬ ТУТ !!!
      */
-    fun addItems(newItems: List<RickMortyItem>) {
+    fun addItemsInMyRecycler(newItems: List<RickMortyItem>) {
         val startPosition = items.size
         items.addAll(newItems)
         notifyItemRangeInserted(startPosition, newItems.size)

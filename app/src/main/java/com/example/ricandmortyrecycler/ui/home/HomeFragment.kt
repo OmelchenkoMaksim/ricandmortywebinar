@@ -6,10 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.databinding.FragmentHomeBinding
@@ -30,7 +28,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
     // Создание адаптера один раз:
     private val rickMortyAdapter = RickMortyAdapter(mutableListOf(), this)
-//    private val rickMortyAdapter = RickMortyAdapterDiffUtil(this)
+//    private val rickMortyAdapter = RickMortyAdapterDiffUtil()
 
 
     private lateinit var apiProvider: ApiProvider
@@ -48,18 +46,37 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
         binding.charactersRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-
 //       Горизонтальный
 //        binding.charactersRecyclerView.layoutManager =
 //            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-
-
         binding.charactersRecyclerView.adapter =
             rickMortyAdapter
+        return binding.root
+    }
 
-        // Обработчик прокрутки RecyclerView
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+//        scrollListener()
+
+        loadCharacters()
+
+        binding.prevButton.setOnClickListener {
+            currentPage--
+            loadCharacters()
+        }
+
+        binding.nextButton.setOnClickListener {
+            currentPage++
+            loadCharacters()
+        }
+
+
+    }
+
+    // Обработчик прокрутки RecyclerView
+    private fun scrollListener() {
         binding.charactersRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
             // Этот метод вызывается при прокрутке
@@ -91,29 +108,6 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
                 }
             }
         })
-
-        return binding.root
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        loadCharacters()
-
-
-
-        binding.prevButton.setOnClickListener {
-            currentPage--
-            loadCharacters()
-        }
-
-        binding.nextButton.setOnClickListener {
-            currentPage++
-            loadCharacters()
-        }
-
-
     }
 
     private fun loadCharacters() {
@@ -130,9 +124,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
 
                         characterAdapter(response)
 
-
 //                        rickAdapterWithManyItems(response)
-
 
 //                        rickAdapterSmooth(response)
 
@@ -174,6 +166,7 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
         items.add(RickMortyItem.Description("Здесь представлены различные герои..."))
 
         items.addAll(response.body()!!.results)
+
         binding.charactersRecyclerView.adapter = RickMortyAdapter(items, this)
     }
 
@@ -181,15 +174,15 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
      * Адаптер с плавной подгрузкой
      */
     private fun rickAdapterSmooth(response: Response<CharactersResponse>) {
-        val newItems = mutableListOf<RickMortyItem>()
-        newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
-        newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
+        with(mutableListOf<RickMortyItem>()) {
+            add(RickMortyItem.Title("Герои из мира Rick и Morty"))
+            add(RickMortyItem.Description("Здесь представлены различные герои..."))
 
-        newItems.addAll(response.body()!!.results)
-
-        rickMortyAdapter
-        rickMortyAdapter.addItems(newItems)
-
+            addAll(response.body()!!.results)
+            rickMortyAdapter as RickMortyAdapter
+// плавность работает за счет этого метода!
+           rickMortyAdapter.addItemsInMyRecycler(this)
+        }
     }
 
     //    этот список нужен для плавного списка с DiffUtil
@@ -199,10 +192,10 @@ class HomeFragment : Fragment(), OnSwitchClickListener {
     /*Адаптер с плавной подгрузкой*/
     private fun rickAdapterSmoothDiffUtil(response: Response<CharactersResponse>) {
         val newItems = mutableListOf<RickMortyItem>()
-        if (currentPage % 10 == 0) {
-            newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
-            newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
-        }
+
+        newItems.add(RickMortyItem.Title("Герои из мира Rick и Morty"))
+        newItems.add(RickMortyItem.Description("Здесь представлены различные герои..."))
+
         newItems.addAll(response.body()!!.results)
 
         allItems.addAll(newItems)  // Добавляем новые элементы к существующим

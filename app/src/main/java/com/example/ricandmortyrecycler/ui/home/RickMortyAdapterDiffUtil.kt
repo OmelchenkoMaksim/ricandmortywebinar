@@ -20,7 +20,6 @@ import com.example.ricandmortyrecycler.models.RickMortyItem
  * вы передаете экземпляр DiffUtil.ItemCallback в качестве аргумента.
  */
 class RickMortyAdapterDiffUtil(
-    private val switchClickListener: OnSwitchClickListener
 ) : ListAdapter<RickMortyItem, RecyclerView.ViewHolder>(RickMortyDiffCallback()) {
 
     //    Обновление данных: Вместо прямого обновления списка в адаптере (как вы бы делали с обычным RecyclerView.Adapter),
@@ -83,14 +82,10 @@ class RickMortyAdapterDiffUtil(
 
     inner class DescriptionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val descriptionTextView: TextView = itemView.findViewById(R.id.descriptionTextView)
-        private val switch: View = itemView.findViewById(R.id.switchMeUp)
 
         fun bind(item: RickMortyItem.Description) {
             descriptionTextView.text = item.text
 
-            switch.setOnClickListener {
-                switchClickListener.onSwitchClicked()
-            }
         }
     }
 
