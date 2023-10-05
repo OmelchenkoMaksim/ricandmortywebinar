@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ricandmortyrecycler.R
 import com.example.ricandmortyrecycler.models.Location
 
-class LocationsAdapter(private val locations: List<Location>) : RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
+class LocationsAdapter(private val locations: List<Location>) :
+    RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameTextView: TextView = itemView.findViewById(R.id.locationNameTextView)
@@ -16,7 +17,8 @@ class LocationsAdapter(private val locations: List<Location>) : RecyclerView.Ada
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.location_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_location, parent, false)
         return ViewHolder(view)
     }
 

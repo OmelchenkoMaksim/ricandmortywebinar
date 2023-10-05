@@ -1,5 +1,6 @@
 package com.example.ricandmortyrecycler.ui.dashboard
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +13,7 @@ import com.example.ricandmortyrecycler.MainActivity
 import com.example.ricandmortyrecycler.R
 import com.example.ricandmortyrecycler.databinding.FragmentDashboardBinding
 import com.example.ricandmortyrecycler.models.LocationsResponse
-import com.example.ricandmortyrecycler.ui.home.CharactersAdapter
+import com.example.ricandmortyrecycler.network.ApiProvider
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,6 +27,15 @@ class DashboardFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var currentPage = 1
+
+    private lateinit var apiProvider: ApiProvider
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            apiProvider = context.apiProvider
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,7 +70,7 @@ class DashboardFragment : Fragment() {
     }
 
     private fun loadLocations() {
-        MainActivity.api!!.getLocations(currentPage)
+        apiProvider.api.getLocations(currentPage)
             .enqueue(object : Callback<LocationsResponse> {
                 override fun onResponse(
                     call: Call<LocationsResponse>,
